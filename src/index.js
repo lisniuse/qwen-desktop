@@ -1,7 +1,11 @@
 const { app, BrowserWindow, Tray, Menu, globalShortcut, screen } = require('electron')
-const loadPlugins = require('./load_plugins')
 
-const isDevelopment = process.argv.some(arg => arg.includes('--dev') || arg.includes('--mode=development'));
+const path = require('path');
+const loadPlugins = require('./load_plugins')
+pluginsCode = loadPlugins();
+
+const isDebug = process.argv.some(arg => arg.includes('--inspect'));
+const isDev = process.argv.some(arg => arg.includes('--dev'));
 let win = null
 
 function createWindow () {
@@ -33,8 +37,7 @@ function createWindow () {
 
   // 监听加载完成事件
   win.webContents.on('did-finish-load', () => {
-    pluginsCode = loadPlugins();
-    if (isDevelopment) {
+    if (isDebug) {
       win.webContents.openDevTools(); // 启动 div Tools
       console.log(pluginsCode) // 打印 所有插件的源代码
     }
@@ -46,7 +49,10 @@ function createWindow () {
 
 function createTray() {
   // 创建托盘图标
-  const iconPath = process.platform === 'win32' ? 'src/assets/icons/win/logo.ico' : 'src/assets/icons/png/1024x1024.png';
+  let iconPath = process.platform === 'win32' ? path.join(process.resourcesPath, 'assets/icons/win/logo.ico') : path.join(process.resourcesPath, 'assets/icons/win/1024x1024.png');
+  if (isDev) {
+    iconPath = process.platform === 'win32' ? 'src/assets/icons/win/logo.ico' : 'src/assets/icons/png/1024x1024.png';
+  }
   tray = new Tray(iconPath);
 
   const createTrayMenu = () => {
