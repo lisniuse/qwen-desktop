@@ -1,9 +1,5 @@
 var divs = document.querySelectorAll('div[class^="side--"]');
 sideDiv = divs[0]
-// sideDiv.style.width = "0px";
-// sideDiv.style.overflow = "hidden";
-// sideDiv.style.padding = "0";
-// sideDiv.style.margin = "0";
 sideDiv.style.position = "fixed";
 sideDiv.style.boxSizing = "border-box";
 sideDiv.style.top = "0";

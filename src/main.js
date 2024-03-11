@@ -1,12 +1,7 @@
 const { app, BrowserWindow, Tray, Menu, globalShortcut, screen } = require('electron')
 const loadPlugins = require('./load_plugins')
 
-console.log(process.env.NODE_ENV)
-
 const isDevelopment = process.argv.some(arg => arg.includes('--dev') || arg.includes('--mode=development'));
-
-console.log(isDevelopment);
-
 let win = null
 
 function createWindow () {
