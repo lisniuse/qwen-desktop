@@ -23,7 +23,7 @@ yarn start:dev
 
 ## 待实现
 
-- [x] 支持Winodws系统
+- [x] 支持Windows系统
 - [x] AI输出代码一键本地运行（目前支持Python、NodeJS、Html）
 - [ ] 支持MAC系统
 - [ ] 支持Linux系统

@@ -132,7 +132,9 @@ app.on('window-all-closed', function () {
 
 ipcMain.on('eval-code', (event, code, lang) => {
   const evalFilePath = writeTempFile(code, lang)
-  console.log('evalFilePath:', evalFilePath)
+  if (isDebug) {
+    console.log('evalFilePath: ', evalFilePath)
+  }
   switch(lang) {
     case 'Python':
       exec(`start cmd /K "echo. && echo 【通义千问桌面端提醒】你即将执行 ${evalFilePath} && echo. && python \"${evalFilePath}\""`, () => {
