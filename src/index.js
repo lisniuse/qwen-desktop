@@ -1,6 +1,10 @@
-const { app, BrowserWindow, Tray, Menu, globalShortcut, screen } = require('electron')
+const fs  = require('fs')
+const os = require('os')
+const path = require('path')
+const { exec } = require('child_process');
 
-const path = require('path');
+const { app, BrowserWindow, ipcMain, Tray, Menu, globalShortcut, screen } = require('electron')
+
 const loadPlugins = require('./load_plugins')
 pluginsCode = loadPlugins();
 
@@ -22,6 +26,7 @@ function createWindow () {
     resizable: false,
     titleBarStyle: 'hiddenInset', // macOS 上可以使用此选项以隐藏菜单栏但保留自定义标题栏
     webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: true
     }
   })
@@ -81,6 +86,31 @@ function createTray() {
   });
 }
 
+// 生成一个随机文件名
+function generateRandomFileName(lang) {
+  let extensionName = 'txt'
+  switch(lang) {
+    case 'Python':
+      extensionName = 'py'
+      break
+    case 'Html':
+      extensionName = 'html'
+      break
+    case 'Javascript':
+      extensionName = 'js'
+      break
+  }
+  return Math.random().toString(36).substring(2, 10) + '.' + extensionName // 这里生成的是一个随机的8位字符串加.txt扩展名
+}
+
+// 将需要执行的代码写入临时文件
+function writeTempFile(codeString, lang) {
+  const tempDir = os.tmpdir()
+  const filePath = path.join(tempDir, generateRandomFileName(lang))
+  fs.writeFileSync(filePath, codeString, 'utf8')
+  return filePath
+}
+
 app.whenReady().then(() => {
   win = createWindow();
   createTray();
@@ -98,4 +128,24 @@ app.whenReady().then(() => {
 
 app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') app.quit()
+})
+
+ipcMain.on('eval-code', (event, code, lang) => {
+  const evalFilePath = writeTempFile(code, lang)
+  console.log('evalFilePath:', evalFilePath)
+  switch(lang) {
+    case 'Python':
+      exec(`start cmd /K "echo. && echo 【通义千问桌面端提醒】你即将执行 ${evalFilePath} && echo. && python \"${evalFilePath}\""`, () => {
+        fs.unlink(evalFilePath, () => {})
+      })
+      break
+    case 'Html':
+      exec(`start "" "${evalFilePath}"`, () => {})
+      break
+    case 'Javascript':
+      exec(`start cmd /K "echo. && echo 【通义千问桌面端提醒】你即将执行 ${evalFilePath} && echo. && node \"${evalFilePath}\""`, () => {
+        fs.unlink(evalFilePath, () => {})
+      })
+      break
+  }
 })

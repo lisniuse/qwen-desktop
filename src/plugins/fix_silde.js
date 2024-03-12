@@ -38,13 +38,7 @@ var cssRules = `
 
 // 将CSS规则设置到<style>元素的内容中
 styleElement.type = 'text/css';
-if (styleElement.styleSheet) {
-  // 对于IE浏览器
-  styleElement.styleSheet.cssText = cssRules;
-} else {
-  // 对于其他浏览器
-  styleElement.appendChild(document.createTextNode(cssRules));
-}
+styleElement.appendChild(document.createTextNode(cssRules));
 
 // 将<style>元素添加到<head>中
 document.head.appendChild(styleElement);
